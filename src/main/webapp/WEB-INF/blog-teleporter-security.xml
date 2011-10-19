@@ -22,7 +22,7 @@
     </authentication-provider>
   </authentication-manager>
   
-    <oauth:consumer resource-details-service-ref="resourceDetails" oauth-failure-page="/oauth_error.jsp">
+    <oauth:consumer resource-details-service-ref="resourceDetails" oauth-failure-page="/oauth_error.htm">
         <oauth:url pattern="/" resources="tumblrBlog"/>
     </oauth:consumer>
 
@@ -31,7 +31,9 @@
                     key="${oauth_key_tumblr}"
                     secret="${oauth_secret_tumblr}"
                     request-token-url="${oauth_request_token_url_tumblr}"
+                    request-token-method="POST"
                     user-authorization-url="${oauth_user_authorization_url_tumblr}"
-                    access-token-url="${oauth_access_token_url_tumblr}"/>
+                    access-token-url="${oauth_access_token_url_tumblr}"
+                    access-token-method="POST"/>
   </oauth:resource-details-service>
 </beans:beans>

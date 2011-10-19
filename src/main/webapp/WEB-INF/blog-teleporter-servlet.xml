@@ -32,10 +32,14 @@
     </bean>
     
     <mvc:annotation-driven/>
+    <!-- 
+    <mvc:resources mapping="/resources/**" location="/, classpath:/META-INF/web-resources/"/>
+    -->
     <mvc:default-servlet-handler/>
 
     <mvc:view-controller path="/" view-name="welcome"/>
     <mvc:view-controller path="/welcome.htm" view-name="welcome"/>
+    <mvc:view-controller path="/oauth_error.htm" view-name="oauth_error"/>
     
     <!-- View Resolver -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
