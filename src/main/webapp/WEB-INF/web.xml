@@ -6,15 +6,15 @@
   <context-param>
     <javaee:param-name>contextConfigLocation</javaee:param-name>
     <javaee:param-value>
-           /WEB-INF/blog-teleporter-servlet.xml
+           /WEB-INF/blog_teleporter-servlet.xml
         </javaee:param-value>
   </context-param>
   <servlet>
-    <servlet-name>blog-teleporter</servlet-name>
+    <servlet-name>blog_teleporter</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>blog-teleporter</servlet-name>
+    <servlet-name>blog_teleporter</servlet-name>
     <url-pattern>*.htm</url-pattern>
   </servlet-mapping>
   <filter>

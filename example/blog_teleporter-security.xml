@@ -23,17 +23,17 @@
   </authentication-manager>
   
     <oauth:consumer resource-details-service-ref="resourceDetails" oauth-failure-page="/oauth_error.htm">
-        <oauth:url pattern="/" resources="tumblrBlog"/>
+        <oauth:url pattern="/teleporter.htm" resources="tumblrBlog"/>
     </oauth:consumer>
 
   <oauth:resource-details-service id="resourceDetails">
     <oauth:resource id="tumblrBlog"
-                    key="${oauth_key_tumblr}"
-                    secret="${oauth_secret_tumblr}"
-                    request-token-url="${oauth_request_token_url_tumblr}"
+                    key="tumblr-consumer-key"
+                    secret="SHHHHH!!!!!!!!!!"
+                    request-token-url="http://www.tumblr.com/oauth/request_token"
                     request-token-method="POST"
-                    user-authorization-url="${oauth_user_authorization_url_tumblr}"
-                    access-token-url="${oauth_access_token_url_tumblr}"
+                    user-authorization-url="http://www.tumblr.com/oauth/authorize"
+                    access-token-url="http://www.tumblr.com/oauth/access_token"
                     access-token-method="POST"/>
   </oauth:resource-details-service>
 </beans:beans>
