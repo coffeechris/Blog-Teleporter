@@ -32,37 +32,24 @@
     </bean>
     
     <mvc:annotation-driven/>
-    <!-- 
     <mvc:resources mapping="/resources/**" location="/, classpath:/META-INF/web-resources/"/>
-    -->
     <mvc:default-servlet-handler/>
 
-    <mvc:view-controller path="/" view-name="welcome"/>
+    <mvc:view-controller path="/"            view-name="welcome"/>
     <mvc:view-controller path="/welcome.htm" view-name="welcome"/>
-    <mvc:view-controller path="/oauth_error.htm" view-name="oauth_error"/>
     
     <!-- View Resolver -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
-        <property name="prefix" value="/WEB-INF/jsp/"/>
-        <property name="suffix" value=".jsp"/>        
+        <property name="prefix"    value="/WEB-INF/jsp/"/>
+        <property name="suffix"    value=".jsp"/>        
     </bean>
     
     <bean id="teleporterController" class="org.blog_teleporter.controllers.TeleporterController">
+        <property name="apiKey"    value="${oauth_key_tumblr}"/>
+        <property name="apiSecret" value="${oauth_secret_tumblr}"/>
+        <property name="baseURL"   value="${baseURL_tumblr}"/>
         <property name="teleporterView" value="teleporter"/>
-        <property name="tumblrService" ref="tumblrService"/>
-    </bean>
-     
-    <bean id="tumblrService" class="org.blog_teleporter.services.TumblrService">
-        <property name="apiKey" value="${oauth_key_tumblr}"/>
-        <property name="baseURL" value="${baseURL_tumblr}"/>
-        <property name="tumblrRestTemplate">
-            <bean class="org.springframework.security.oauth.consumer.OAuthRestTemplate">
-                <constructor-arg ref="tumblrBlog" />
-            </bean>
-        </property>
-    </bean>
-    
-    <import resource="file:/opt/configs/BlogTeleporter/blog_teleporter-security.xml"/>
+    </bean> 
 </beans>
             

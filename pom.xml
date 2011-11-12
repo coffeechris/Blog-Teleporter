@@ -33,8 +33,6 @@
 
     <properties>
         <spring-version>3.0.6.RELEASE</spring-version>
-        <spring-security-version>3.0.7.RELEASE</spring-security-version>
-        <spring-security-oath-version>1.0.0.M3</spring-security-oath-version>
     </properties>
     
     <dependencies>
@@ -50,36 +48,6 @@
             <artifactId>spring-tx</artifactId>
             <version>${spring-version}</version>
         </dependency>
-   
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>${spring-security-version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>${spring-security-version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>${spring-security-version}</version>
-        </dependency>
-        
-        <dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-taglibs</artifactId>
-			<version>${spring-security-version}</version>
-        </dependency>
-     
-		<dependency>
-			<groupId>org.springframework.security.oauth</groupId>
-			<artifactId>spring-security-oauth</artifactId>
-			<version>${spring-security-oath-version}</version>
-		</dependency>
 
         <!-- J2EE -->
 		<dependency>
@@ -103,6 +71,19 @@
             <version>1.1.1</version>
         </dependency>
         
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0.1</version>
+        </dependency>
+        
+        <!-- OAuth -->
+        <dependency>
+			<groupId>org.scribe</groupId>
+			<artifactId>scribe</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.testng</groupId>
