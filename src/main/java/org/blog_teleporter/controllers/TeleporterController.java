@@ -2,9 +2,9 @@ package org.blog_teleporter.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.blog_teleporter.services.TumblrService;
 import org.blog_teleporter.utils.TumblrAPI;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthRequest;
@@ -22,9 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class TeleporterController {
     
+    private TumblrService tumblrService;
+    
     private String apiKey;
     private String apiSecret;
-    private String baseURL;
     
     private String teleporterView;
     
@@ -36,20 +37,23 @@ public class TeleporterController {
                               @RequestParam(value="oauth_verifier", required=false) String oauthVerifier) {
         OAuthService service = (OAuthService)request.getSession().getAttribute("oauth_service");
         Token requestToken = (Token)request.getSession().getAttribute("oauth_request_token");
+        Token accessToken  = (Token)request.getSession().getAttribute("oauth_access_token");
         
-        if (StringUtils.isBlank(oauthToken) || StringUtils.isBlank(oauthVerifier) || service == null || requestToken == null) {
+        if (service == null || requestToken == null) {
+            logger.debug("oauth required - redirecting");
             return oauthRedirect(request, request.getRequestURL().toString());
         }      
         
-        Verifier verifier = new Verifier(oauthVerifier);
-        Token accessToken = service.getAccessToken(requestToken, verifier);
+        if (accessToken == null) {
+            logger.debug("initializing access token");
+            Verifier verifier = new Verifier(oauthVerifier);
+            accessToken = service.getAccessToken(requestToken, verifier);
+            request.getSession().setAttribute("oauth_access_token", accessToken);
+        }
         
-        OAuthRequest oauthRequest = new OAuthRequest(Verb.POST, baseURL + "verycrispy.tumblr.com/post/delete");
-        oauthRequest.addBodyParameter("id", "11902989988");
-        service.signRequest(accessToken, oauthRequest); 
+        tumblrService.deletePost(service, accessToken, "verycrispy.tumblr.com", "11902989988");
         
-        Response response = oauthRequest.send();
-        logger.debug(response.getBody());
+        tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "a test title", "a test body");
         
         return teleporterView;
     }
@@ -71,6 +75,14 @@ public class TeleporterController {
         return "redirect:" + authUrl;
     }
     
+    public TumblrService getTumblrService() {
+        return tumblrService;
+    }
+
+    public void setTumblrService(TumblrService tumblrService) {
+        this.tumblrService = tumblrService;
+    }
+    
     public String getApiKey() {
         return apiKey;
     }
@@ -85,14 +97,6 @@ public class TeleporterController {
 
     public void setApiSecret(String apiSecret) {
         this.apiSecret = apiSecret;
-    }
-
-    public String getBaseURL() {
-        return baseURL;
-    }
-
-    public void setBaseURL(String baseURL) {
-        this.baseURL = baseURL;
     }
     
     public String getTeleporterView() {

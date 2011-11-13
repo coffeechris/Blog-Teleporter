@@ -46,10 +46,14 @@
     </bean>
     
     <bean id="teleporterController" class="org.blog_teleporter.controllers.TeleporterController">
+        <property name="tumblrService" ref="tumblrService"/>
         <property name="apiKey"    value="${oauth_key_tumblr}"/>
         <property name="apiSecret" value="${oauth_secret_tumblr}"/>
-        <property name="baseURL"   value="${baseURL_tumblr}"/>
         <property name="teleporterView" value="teleporter"/>
     </bean> 
+    
+    <bean id="tumblrService" class="org.blog_teleporter.services.TumblrService">
+        <property name="baseURL"   value="${baseURL_tumblr}"/>    
+    </bean>
 </beans>
             
