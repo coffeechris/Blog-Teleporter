@@ -53,8 +53,9 @@ public class TeleporterController {
         
         tumblrService.deletePost(service, accessToken, "verycrispy.tumblr.com", "11902989988");
         
-        tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "a test title", "a test body");
-        
+        tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 1", "a test body 1");
+        tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 2", "a test body 2");
+
         return teleporterView;
     }
 

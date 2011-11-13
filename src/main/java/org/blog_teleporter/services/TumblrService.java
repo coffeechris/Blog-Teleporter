@@ -1,5 +1,7 @@
 package org.blog_teleporter.services;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.scribe.model.OAuthRequest;
@@ -14,12 +16,12 @@ public class TumblrService {
     private final Log logger = LogFactory.getLog(getClass());
 
     public void createTextPost(OAuthService service, Token accessToken, String blogName, 
-            String tags, String title, String body) {
+            String tags, String date, String title, String body) {
         OAuthRequest oauthRequest = new OAuthRequest(Verb.POST, baseURL + blogName + "/post");
         oauthRequest.addBodyParameter("type",  "text");
         oauthRequest.addBodyParameter("state", "published");
         oauthRequest.addBodyParameter("tags",  tags);
-        oauthRequest.addBodyParameter("date",  "2011-11-10 10:30");
+        oauthRequest.addBodyParameter("date",  date);
 
         oauthRequest.addBodyParameter("title", title);
         oauthRequest.addBodyParameter("body",  body);
@@ -29,8 +31,16 @@ public class TumblrService {
         logger.debug(response.getBody());
     }
     
-    public void getTextPostsByTag() {
+    public List<Long> getTextPostsByTag(OAuthService service, Token accessToken, String blogName, String tag) {
+        OAuthRequest oauthRequest = new OAuthRequest(Verb.POST, baseURL + blogName + "/post");
+        
+        service.signRequest(accessToken, oauthRequest);
+        
+        Response response = oauthRequest.send();
+        logger.debug(response.getBody());
+        
         //TODO: implement
+        return null;
     }
     
     public void deletePost(OAuthService service, Token accessToken, String blogName, String postId) {
