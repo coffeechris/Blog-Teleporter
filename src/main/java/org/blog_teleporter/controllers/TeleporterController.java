@@ -51,10 +51,12 @@ public class TeleporterController {
             request.getSession().setAttribute("oauth_access_token", accessToken);
         }
         
-        tumblrService.deletePost(service, accessToken, "verycrispy.tumblr.com", "11902989988");
+        //tumblrService.deletePost(service, accessToken, "verycrispy.tumblr.com", "11902989988");
         
-        tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 1", "a test body 1");
-        tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 2", "a test body 2");
+        //tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 1", "a test body 1");
+        //tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 2", "a test body 2");
+        
+        tumblrService.getTextPostsByTag(service, accessToken, "verycrispy.tumblr.com", apiKey, "teleporter");
 
         return teleporterView;
     }

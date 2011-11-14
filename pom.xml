@@ -6,29 +6,29 @@
     <packaging>war</packaging>
 
     <build>
-	    <plugins>
-	        <plugin>
-	            <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-			        <source>1.6</source>
-			        <target>1.6</target>
-	            </configuration>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
                 <version>2.3.2</version>
-	        </plugin>
-	        <plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-				<configuration>
-			        <connectors>
-			            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-			                <port>8888</port>
-			            </connector>
-			        </connectors>
-		        </configuration>
-		        <version>6.1.26</version>
-	        </plugin>
-	    </plugins>
+            </plugin>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <configuration>
+                    <connectors>
+                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                            <port>8888</port>
+                        </connector>
+                    </connectors>
+                </configuration>
+                <version>6.1.26</version>
+            </plugin>
+        </plugins>
     </build>
 
     <properties>
@@ -37,11 +37,11 @@
     
     <dependencies>
         <!-- Spring -->
-	   <dependency>
-	       <groupId>org.springframework</groupId>
-	       <artifactId>spring-webmvc</artifactId>
-	       <version>${spring-version}</version>
-	   </dependency>
+       <dependency>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-webmvc</artifactId>
+           <version>${spring-version}</version>
+       </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -50,21 +50,21 @@
         </dependency>
 
         <!-- J2EE -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<!-- Apache Commons -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- Apache Commons -->
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -79,17 +79,30 @@
         
         <dependency>
             <groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.0.1</version>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.0.1</version>
         </dependency>
         
         <!-- OAuth -->
         <dependency>
-			<groupId>org.scribe</groupId>
-			<artifactId>scribe</artifactId>
-			<version>1.2.3</version>
-		</dependency>
+            <groupId>org.scribe</groupId>
+            <artifactId>scribe</artifactId>
+            <version>1.2.3</version>
+        </dependency>
 
+        <!-- JSON  -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+        
         <!-- Testing -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -100,20 +113,20 @@
     </dependencies>
     
     <repositories> 
-		<repository>
+        <repository>
             <id>repository.springframework.maven.release</id>
             <name>Spring Framework Maven Release Repository</name>
             <url>http://maven.springframework.org/release</url>
-		</repository>
-		<repository>
-			<id>repository.springframework.maven.milestone</id>
-			<name>Spring Framework Maven Milestone Repository</name>
-			<url>http://maven.springframework.org/milestone</url>
-		</repository>
-		<repository>
-			<id>repository.springframework.maven.snapshot</id>
-			<name>Spring Framework Maven Snapshot Repository</name>
-			<url>http://maven.springframework.org/snapshot</url>
-		</repository>  
+        </repository>
+        <repository>
+            <id>repository.springframework.maven.milestone</id>
+            <name>Spring Framework Maven Milestone Repository</name>
+            <url>http://maven.springframework.org/milestone</url>
+        </repository>
+        <repository>
+            <id>repository.springframework.maven.snapshot</id>
+            <name>Spring Framework Maven Snapshot Repository</name>
+            <url>http://maven.springframework.org/snapshot</url>
+        </repository>  
     </repositories>
 </project>
