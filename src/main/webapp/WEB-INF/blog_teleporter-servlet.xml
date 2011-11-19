@@ -50,6 +50,7 @@
         <property name="apiKey"    value="${oauth_key_tumblr}"/>
         <property name="apiSecret" value="${oauth_secret_tumblr}"/>
         <property name="teleporterView" value="teleporter"/>
+        <property name="deleteTeleportedPostsView" value="deleteTeleportedPostsView"/>
     </bean> 
     
     <bean id="tumblrService" class="org.blog_teleporter.services.TumblrService">

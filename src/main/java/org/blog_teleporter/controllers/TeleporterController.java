@@ -1,5 +1,7 @@
 package org.blog_teleporter.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -7,11 +9,8 @@ import org.apache.commons.logging.LogFactory;
 import org.blog_teleporter.services.TumblrService;
 import org.blog_teleporter.utils.TumblrAPI;
 import org.scribe.builder.ServiceBuilder;
-import org.scribe.model.OAuthRequest;
-import org.scribe.model.Response;
 import org.scribe.model.SignatureType;
 import org.scribe.model.Token;
-import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 import org.springframework.stereotype.Controller;
@@ -62,13 +61,23 @@ public class TeleporterController {
         return teleporterView;
     }
     
-    public String deleteTeleportedPosts (HttpServletRequest request) {
+    @RequestMapping(value="/delete_teleported_posts.htm")
+    public String deleteTeleportedPosts (HttpServletRequest request,
+                                         @RequestParam(value="blog_name") String blogName,
+                                         @RequestParam(value="tag") String tag) {
         OAuthService service = (OAuthService)request.getSession().getAttribute("oauth_service");
         Token requestToken = (Token)request.getSession().getAttribute("oauth_request_token");
         Token accessToken  = (Token)request.getSession().getAttribute("oauth_access_token");
         if (service == null || requestToken == null || accessToken == null) {
             return "redirect:/teleporter.htm";
         }
+        
+        //get teleposted posts ids
+        List<Long> postIds = tumblrService.getTextPostsByTag(service, accessToken, blogName, apiKey, tag);
+        for (Long postId : postIds) {
+            tumblrService.deletePost(service, accessToken, blogName, postId.toString());
+        }
+        
         return deleteTeleportedPostsView;
     }
 
