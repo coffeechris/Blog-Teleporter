@@ -28,6 +28,7 @@ public class TeleporterController {
     private String apiSecret;
     
     private String teleporterView;
+    private String deleteTeleportedPostsView;
     
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -59,6 +60,16 @@ public class TeleporterController {
         tumblrService.getTextPostsByTag(service, accessToken, "verycrispy.tumblr.com", apiKey, "teleporter");
 
         return teleporterView;
+    }
+    
+    public String deleteTeleportedPosts (HttpServletRequest request) {
+        OAuthService service = (OAuthService)request.getSession().getAttribute("oauth_service");
+        Token requestToken = (Token)request.getSession().getAttribute("oauth_request_token");
+        Token accessToken  = (Token)request.getSession().getAttribute("oauth_access_token");
+        if (service == null || requestToken == null || accessToken == null) {
+            return "redirect:/teleporter.htm";
+        }
+        return deleteTeleportedPostsView;
     }
 
     private String oauthRedirect (HttpServletRequest request, String callbackURL) {
@@ -108,5 +119,13 @@ public class TeleporterController {
 
     public void setTeleporterView(String teleporterView) {
         this.teleporterView = teleporterView;
+    }
+
+    public String getDeleteTeleportedPostsView() {
+        return deleteTeleportedPostsView;
+    }
+
+    public void setDeleteTeleportedPostsView(String deleteTeleportedPostsView) {
+        this.deleteTeleportedPostsView = deleteTeleportedPostsView;
     }
 }
