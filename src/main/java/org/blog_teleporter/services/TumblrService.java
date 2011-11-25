@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.blog_teleporter.models.TextPost;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -36,7 +37,7 @@ public class TumblrService {
     }
     
     @SuppressWarnings("unchecked")
-    public List<Long> getTextPostsByTag(OAuthService service, Token accessToken, String blogName, String apiKey, String tag) {
+    public List<TextPost> getTextPostsByTag(OAuthService service, Token accessToken, String blogName, String apiKey, String tag) {
         OAuthRequest oauthRequest = new OAuthRequest(Verb.POST, baseURL + blogName + "/posts");
         oauthRequest.addQuerystringParameter("api_key", apiKey);
         oauthRequest.addQuerystringParameter("tag", tag);
@@ -44,7 +45,7 @@ public class TumblrService {
         
         Response response = oauthRequest.send();
         
-        List<Long> postIds = new ArrayList<Long>();
+        List<TextPost> textPosts = new ArrayList<TextPost>();
         ObjectMapper mapper = new ObjectMapper();
         try {
             Map<String,Object> jsonMsg = mapper.readValue(response.getBody(), Map.class);
@@ -54,18 +55,19 @@ public class TumblrService {
             
             for(Map<String,Object> post : posts) {
                 if (post.get("type").equals("text")) {
-                    postIds.add((Long)post.get("id"));
+                    TextPost textPost = new TextPost((Long)post.get("id"), (String)post.get("title"));
+                    textPosts.add(textPost);
                 }
             }
             
-            logger.debug(postIds);
+            logger.debug(textPosts);
         } 
         catch (IOException e) {
             logger.error("error handling posts's response", e);
             throw new RuntimeException("error handling posts's response", e);
         }
         
-        return postIds;
+        return textPosts;
     }
     
     public void deletePost(OAuthService service, Token accessToken, String blogName, String postId) {

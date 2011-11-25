@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.blog_teleporter.models.TextPost;
+import org.blog_teleporter.models.form.DeletePosts;
 import org.blog_teleporter.services.TumblrService;
 import org.blog_teleporter.utils.TumblrAPI;
 import org.scribe.builder.ServiceBuilder;
@@ -14,6 +16,8 @@ import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,10 +65,13 @@ public class TeleporterController {
         return teleporterView;
     }
     
-    @RequestMapping(value="/delete_teleported_posts.htm")
-    public String deleteTeleportedPosts (HttpServletRequest request,
-                                         @RequestParam(value="blog_name") String blogName,
-                                         @RequestParam(value="tag") String tag) {
+    @RequestMapping(value="/delete_teleported_posts.htm", method=RequestMethod.GET)
+    public String deleteTeleportedPosts (@ModelAttribute("deletePosts") DeletePosts deletePosts) {        
+        return deleteTeleportedPostsView;
+    }
+    
+    @RequestMapping(value="/delete_teleported_posts.htm", method=RequestMethod.POST)
+    public String deleteTeleportedPosts (HttpServletRequest request, @ModelAttribute("deletePosts") DeletePosts deletePosts, Model model) {
         OAuthService service = (OAuthService)request.getSession().getAttribute("oauth_service");
         Token requestToken = (Token)request.getSession().getAttribute("oauth_request_token");
         Token accessToken  = (Token)request.getSession().getAttribute("oauth_access_token");
@@ -73,9 +80,17 @@ public class TeleporterController {
         }
         
         //get teleposted posts ids
-        List<Long> postIds = tumblrService.getTextPostsByTag(service, accessToken, blogName, apiKey, tag);
-        for (Long postId : postIds) {
-            tumblrService.deletePost(service, accessToken, blogName, postId.toString());
+        logger.debug("Get posts to delete for blog: " + deletePosts.getBlogName() + ", tag: " + deletePosts.getTag());
+        List<TextPost> posts = tumblrService.getTextPostsByTag(service, accessToken, deletePosts.getBlogName(), apiKey, deletePosts.getTag());
+        if (deletePosts.isRemovable()) {
+            logger.debug("Start deleting posts");
+            for (TextPost post : posts) {
+                tumblrService.deletePost(service, accessToken, deletePosts.getBlogName(), post.getId().toString());
+            }
+        }
+        else {
+            deletePosts.setRemovable(true);
+            model.addAttribute("tumblrTextPosts", posts);
         }
         
         return deleteTeleportedPostsView;

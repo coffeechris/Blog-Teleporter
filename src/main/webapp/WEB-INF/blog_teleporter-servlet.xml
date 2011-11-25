@@ -31,6 +31,14 @@
         </property>
     </bean>
     
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+				<value>messages</value>
+			</list>
+        </property>
+    </bean>
+    
     <mvc:annotation-driven/>
     <mvc:resources mapping="/resources/**" location="/, classpath:/META-INF/web-resources/"/>
     <mvc:default-servlet-handler/>
