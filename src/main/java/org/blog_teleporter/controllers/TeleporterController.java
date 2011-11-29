@@ -4,10 +4,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.blog_teleporter.models.TextPost;
+import org.blog_teleporter.models.form.CrawlTeleport;
 import org.blog_teleporter.models.form.DeletePosts;
+import org.blog_teleporter.services.BlogImportService;
 import org.blog_teleporter.services.TumblrService;
 import org.blog_teleporter.utils.TumblrAPI;
 import org.scribe.builder.ServiceBuilder;
@@ -25,12 +28,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class TeleporterController {
     
+    private BlogImportService blogImportService;
     private TumblrService tumblrService;
     
     private String apiKey;
     private String apiSecret;
     
     private String teleporterView;
+    private String teleportPostsViews;
     private String deleteTeleportedPostsView;
     
     private final Log logger = LogFactory.getLog(getClass());
@@ -54,15 +59,29 @@ public class TeleporterController {
             accessToken = service.getAccessToken(requestToken, verifier);
             request.getSession().setAttribute("oauth_access_token", accessToken);
         }
-        
-        //tumblrService.deletePost(service, accessToken, "verycrispy.tumblr.com", "11902989988");
-        
-        //tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 1", "a test body 1");
-        //tumblrService.createTextPost(service, accessToken, "verycrispy.tumblr.com", "teleporter", "2011-11-10 10:30", "a test title 2", "a test body 2");
-        
-        tumblrService.getTextPostsByTag(service, accessToken, "verycrispy.tumblr.com", apiKey, "teleporter");
 
         return teleporterView;
+    }
+    
+    @RequestMapping(value="/teleport_posts.htm")
+    public String teleportPosts(HttpServletRequest request, @ModelAttribute("crawlTeleport") CrawlTeleport crawlTeleport) {
+        OAuthService service = (OAuthService)request.getSession().getAttribute("oauth_service");
+        Token requestToken = (Token)request.getSession().getAttribute("oauth_request_token");
+        Token accessToken  = (Token)request.getSession().getAttribute("oauth_access_token");
+        if (service == null || requestToken == null || accessToken == null) {
+            return "redirect:/teleporter.htm";
+        }
+        
+        logger.debug(crawlTeleport);
+        if (StringUtils.isNotBlank(crawlTeleport.getTargetUrl())) {
+            List<TextPost> posts = blogImportService.getTextPostsByCrawl(crawlTeleport.getTargetUrl());
+            for (TextPost post : posts) {
+                tumblrService.createTextPost(service, accessToken, crawlTeleport.getBlogName(), crawlTeleport.getTag(), 
+                        post.getDate(), post.getTitle(), post.getBody());
+            }
+        }
+        
+        return teleportPostsViews;
     }
     
     @RequestMapping(value="/delete_teleported_posts.htm", method=RequestMethod.GET)
@@ -151,5 +170,21 @@ public class TeleporterController {
 
     public void setDeleteTeleportedPostsView(String deleteTeleportedPostsView) {
         this.deleteTeleportedPostsView = deleteTeleportedPostsView;
+    }
+
+    public String getTeleportPostsViews() {
+        return teleportPostsViews;
+    }
+
+    public void setTeleportPostsViews(String teleportPostsViews) {
+        this.teleportPostsViews = teleportPostsViews;
+    }
+
+    public BlogImportService getBlogImportService() {
+        return blogImportService;
+    }
+
+    public void setBlogImportService(BlogImportService blogImportService) {
+        this.blogImportService = blogImportService;
     }
 }
