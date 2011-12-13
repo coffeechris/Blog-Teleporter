@@ -24,3 +24,4 @@ For development purposes, I have configured in the maven pom the jetty plugin so
 
 If you are interested is creating a war that can be deployed to a Java application server, use this command:
     mvn package
+
