@@ -9,9 +9,10 @@ The app is built using Maven. Almost all its dependencies can be pulled from rem
 crawler4j. I have included this dependency in this git repo in the lib folder. You will have to install it in your local maven repo using the following
 command:
 
-    mvn install:install-file -Dfile=lib/crawler4j-2.6.1.jar -DgroupId=edu.uci.ics \
-                             -DartifactId=crawler4j -Dversion=2.6.1 -Dpackaging=jar
+    mvn install:install-file -Dfile=lib/crawler4j-2.6.2.jar -DgroupId=edu.uci.ics \
+                             -DartifactId=crawler4j -Dversion=2.6.2 -Dpackaging=jar
 
+You should note that this is a version of crawler4j that I forked and is available on [github] (https://github.com/cpjordan79/crawler4j).
 I have also taken the liberty to include a copy of the dsiutils and fastutils jars in the lib directory in the event that the DSI maven repo goes away.
 Similar to the crawler4j jar, in that situation, you will have to add those jars to your local maven repo using the following commands:
 
