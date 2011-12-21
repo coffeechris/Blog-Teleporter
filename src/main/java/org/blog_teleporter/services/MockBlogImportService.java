@@ -8,7 +8,7 @@ import org.blog_teleporter.models.TextPost;
 public class MockBlogImportService implements BlogImportService {
 
     @Override
-    public List<TextPost> getTextPostsByCrawl(String url) {
+    public List<TextPost> getTextPostsByCrawl(String blogUrl, String articleUrlPrefix) {
         List<TextPost> posts = new ArrayList<TextPost>();
         
         posts.add(new TextPost(null, "test 1", "test body 1"));

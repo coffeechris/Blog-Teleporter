@@ -74,7 +74,8 @@ public class TeleporterController {
         
         logger.debug(crawlTeleport);
         if (StringUtils.isNotBlank(crawlTeleport.getTargetUrl())) {
-            List<TextPost> posts = blogImportService.getTextPostsByCrawl(crawlTeleport.getTargetUrl());
+            //TODO extend the crawlTeleport form bean to include an article url prefix
+            List<TextPost> posts = blogImportService.getTextPostsByCrawl(crawlTeleport.getTargetUrl(), null);
             for (TextPost post : posts) {
                 tumblrService.createTextPost(service, accessToken, crawlTeleport.getBlogName(), crawlTeleport.getTag(), 
                         post.getDate(), post.getTitle(), post.getBody());
