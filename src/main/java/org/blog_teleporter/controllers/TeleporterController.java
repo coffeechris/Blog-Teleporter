@@ -74,10 +74,16 @@ public class TeleporterController {
         
         logger.debug(crawlTeleport);
         if (StringUtils.isNotBlank(crawlTeleport.getTargetUrl())) {
-            //TODO extend the crawlTeleport form bean to include an article url prefix
-            List<TextPost> posts = blogImportService.getTextPostsByCrawl(crawlTeleport.getTargetUrl(), null);
+            List<TextPost> posts = blogImportService.getTextPostsByCrawl(crawlTeleport.getTargetUrl(), 
+                    crawlTeleport.getArticleUrlPrefix(), crawlTeleport.getBlogEntryStartComment(), crawlTeleport.getBlogEntryEndComment());
             for (TextPost post : posts) {
-                tumblrService.createTextPost(service, accessToken, crawlTeleport.getBlogName(), crawlTeleport.getTag(), 
+                logger.info("posting article '" + post.getTitle() + "' to " + crawlTeleport.getBlogName());
+                StringBuilder tags = new StringBuilder();
+                tags.append(crawlTeleport.getTag());
+                for (String tag : post.getTags()) {
+                    tags.append("," + tag);
+                }
+                tumblrService.createTextPost(service, accessToken, crawlTeleport.getBlogName(), tags.toString(), 
                         post.getDate(), post.getTitle(), post.getBody());
             }
         }

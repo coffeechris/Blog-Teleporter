@@ -19,7 +19,7 @@ public class DrupalImportService implements BlogImportService{
     
     private final Log logger = LogFactory.getLog(getClass());
 
-    public List<TextPost> getTextPostsByCrawl(String blogUrl, String articleUrlPrefix) {
+    public List<TextPost> getTextPostsByCrawl(String blogUrl, String articleUrlPrefix, String blogEntryStartComment, String blogEntryEndComment) {
         URL u = null;
         try {
             u = new URL(blogUrl);
@@ -39,19 +39,27 @@ public class DrupalImportService implements BlogImportService{
             HashMap<String,Object> crawlerConfigs = new HashMap<String,Object>();
             crawlerConfigs.put("blogUrl", blogUrl);
             crawlerConfigs.put("articleUrlPrefix", articleUrlPrefix);
+            crawlerConfigs.put("blogEntryStartComment", blogEntryStartComment);
+            crawlerConfigs.put("blogEntryEndComment", blogEntryEndComment);
             controller.setCrawlerConfigs(crawlerConfigs);
             
             controller.addSeed(blogUrl);
             controller.start(DrupalWebCrawler.class, 1);
+            
+            List<TextPost> posts = new ArrayList<TextPost>();
+            List<Object> crawlersData = controller.getCrawlersLocalData();
+            for (Object data : crawlersData) {
+                @SuppressWarnings("unchecked")
+                List<TextPost> crawlerPosts = (List<TextPost>) data;
+                posts.addAll(crawlerPosts);
+            }
+            
+            return posts;
         } 
         catch (Exception e) {
             logger.error("Error initializing crawlers", e);
             throw new RuntimeException("Error initializing crawlers", e);
         }
-        
-        List<TextPost> posts = new ArrayList<TextPost>();
-
-        return posts;
     }
     
     /**
@@ -62,9 +70,13 @@ public class DrupalImportService implements BlogImportService{
     public static void main (String args[]) {
         DrupalImportService drupal = new DrupalImportService();
         drupal.setRootFolder(args[0]);
-        drupal.getTextPostsByCrawl(args[1], args[2]);
+        List<TextPost> posts = drupal.getTextPostsByCrawl(args[1], args[2], null, null);
         
         System.out.println("crawl complete");
+        System.out.println("number of posts: " + posts.size());
+        for (TextPost post : posts) {
+            System.out.println(post);
+        }
     }
 
     public String getRootFolder() {

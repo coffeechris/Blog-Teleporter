@@ -1,6 +1,5 @@
 package org.blog_teleporter.crawlers;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,13 +7,15 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tika.exception.TikaException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.tika.io.IOUtils;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.html.HtmlMapper;
 import org.apache.tika.parser.html.HtmlParser;
 import org.apache.tika.sax.ToHTMLContentHandler;
+import org.blog_teleporter.models.TextPost;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -27,6 +28,22 @@ public class DrupalWebCrawler extends WebCrawler {
                 + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf"
                 + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 
+    private String blogEntryStartComment;
+    private String blogEntryEndComment;
+    
+    private List<TextPost> posts;
+    
+    private final Log logger = LogFactory.getLog(getClass());
+
+    public DrupalWebCrawler () {
+        super();
+        
+        blogEntryStartComment = "##### BLOG_ENTRY_START #####";
+        blogEntryEndComment = "##### BLOG_ENTRY_END #####";
+        
+        posts = new ArrayList<TextPost>();
+    }
+    
     public boolean shouldVisit(WebURL webUrl) {
         String url = webUrl.getURL().toLowerCase();
         if (filters.matcher(url).matches()) {
@@ -48,46 +65,59 @@ public class DrupalWebCrawler extends WebCrawler {
          */
         String articleUrlPrefix = (String) getConfigs().get("articleUrlPrefix");
         if (StringUtils.isNotBlank(articleUrlPrefix) && page.getWebURL().getURL().startsWith(articleUrlPrefix)) {
-            DrupalBlogContentHandler drupalBlogContentHandler = new DrupalBlogContentHandler();
+            if (StringUtils.isNotBlank((String) getConfigs().get("blogEntryStartComment"))) {
+                blogEntryStartComment = (String) getConfigs().get("blogEntryStartComment");
+            }
+            if (StringUtils.isNotBlank((String) getConfigs().get("blogEntryEndComment"))) {
+                blogEntryEndComment = (String) getConfigs().get("blogEntryEndComment");
+            }
+            
+            DrupalBlogContentHandler drupalBlogContentHandler = new DrupalBlogContentHandler(blogEntryStartComment, blogEntryEndComment);
             Metadata metadata = new Metadata();
             ParseContext parseContext = new ParseContext();
             try {
                 parseContext.set(HtmlMapper.class, AllTagsMapper.class.newInstance());
-            } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            } 
+            catch (Exception e) {
+                logger.error("error setting html mapper in the parse context", e);
+                throw new RuntimeException("error setting html mapper in the parse context", e);
+            } 
             HtmlParser parser = new HtmlParser();
             
             String html = page.getHTML();
             InputStream input = IOUtils.toInputStream(html);
             try {
                 parser.parse(input, drupalBlogContentHandler, metadata, parseContext);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SAXException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (TikaException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } 
+            catch (Exception e) {
+                logger.error("error parsing drupal page", e);
+                throw new RuntimeException("error parsing drupal page", e);
             }
     
             if (drupalBlogContentHandler.isBlogEntry()) {
-                System.out.println(drupalBlogContentHandler.getTitle() + " - " + page.getWebURL());
+                logger.debug("blog entry: " + drupalBlogContentHandler.getTitle() + " - " + 
+                          drupalBlogContentHandler.getSubmissionDate() + " - " + page.getWebURL());
+                
+                posts.add(new TextPost(null, 
+                        drupalBlogContentHandler.getTitle(), 
+                        drupalBlogContentHandler.getBlogEntry(),
+                        drupalBlogContentHandler.getSubmissionDate(),
+                        drupalBlogContentHandler.getTags()));
             }
         }
     } 
+    
+    @Override
+    public Object getMyLocalData() {
+        return posts;
+    }
     
     public static void main (String args[]) throws Exception {
         URL url = new URL("http://chrisjordan.ca/node/33");
         InputStream input = url.openStream();
         
-        DrupalBlogContentHandler drupalBlogContentHandler = new DrupalBlogContentHandler();
+        DrupalBlogContentHandler drupalBlogContentHandler = 
+                new DrupalBlogContentHandler("##### BLOG_ENTRY_START #####", "##### BLOG_ENTRY_END #####");
         
         Metadata metadata = new Metadata();
         ParseContext parseContext = new ParseContext();
@@ -106,22 +136,45 @@ public class DrupalWebCrawler extends WebCrawler {
 
 class DrupalBlogContentHandler extends ToHTMLContentHandler {
     
-    public String blogEntryStartComment = "##### BLOG_ENTRY_START #####";
-    public String blogEntryEndComment = "##### BLOG_ENTRY_END #####";
+    private String blogEntryStartComment;
+    private String blogEntryEndComment;
 
-    private boolean processingDataBlock = false;
-    private int dataBlockTagDepth = 0;
-    private boolean processingBlogEntry = false;
-    private int blogEntryTagDepth = 0;
-    private boolean processingTitle = false;
-    private boolean processingTaxTerm = false;
-    private boolean isBlogEntry = false;
+    private boolean processingDataBlock;
+    private int dataBlockTagDepth;
+    private boolean processingBlogEntry;
+    private int blogEntryTagDepth;
+    private boolean processingTitle;
+    private boolean processingSubmissionDate;
+    private boolean processingTaxTerm;
+    private boolean isBlogEntry;
     
     private String blogEntry;
-    private StringBuffer title = new StringBuffer();
-    private StringBuffer submissionDate = new StringBuffer();
-    private StringBuffer currentTag = new StringBuffer();
-    private List<String> tags = new ArrayList<String>();
+    private StringBuffer title;
+    private StringBuffer submissionDate;
+    private StringBuffer currentTag;
+    private List<String> tags;
+    
+    public DrupalBlogContentHandler (String blogEntryStartComment, String blogEntryEndComment) {
+        super();
+        
+        this.blogEntryStartComment = blogEntryStartComment;
+        this.blogEntryEndComment = blogEntryEndComment;
+
+        processingDataBlock = false;
+        dataBlockTagDepth = 0;
+        processingBlogEntry = false;
+        blogEntryTagDepth = 0;
+        processingTitle = false;
+        processingSubmissionDate = false;
+        processingTaxTerm = false;
+        isBlogEntry = false;
+        
+        blogEntry = null;
+        title = new StringBuffer();
+        submissionDate = new StringBuffer();
+        currentTag = new StringBuffer();
+        tags = new ArrayList<String>();
+    }
     
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
@@ -149,6 +202,11 @@ class DrupalBlogContentHandler extends ToHTMLContentHandler {
                 processingTitle = true;
             }
             
+            //Found submission date
+            if (qName.equalsIgnoreCase("span") && StringUtils.equals(atts.getValue("class"), "submitted")) {
+                processingSubmissionDate = true;
+            }
+            
             //Found taxonomy term
             if (qName.equalsIgnoreCase("li") && StringUtils.contains(atts.getValue("class"), "taxonomy_term")) {
                 processingTaxTerm = true;
@@ -169,6 +227,10 @@ class DrupalBlogContentHandler extends ToHTMLContentHandler {
             title.append(ch, start, length);
         }
         
+        if (processingSubmissionDate) {
+            submissionDate.append(ch, start, length);
+        }
+        
         if (processingTaxTerm) {
             currentTag.append(ch, start, length);
         }
@@ -179,6 +241,11 @@ class DrupalBlogContentHandler extends ToHTMLContentHandler {
         //Title has ended
         if (processingTitle) {
             processingTitle = false;
+        }
+        
+        //Submission date has ended
+        if (processingSubmissionDate) {
+            processingSubmissionDate = false;
         }
         
         //Taxonomy term has ended
@@ -230,7 +297,11 @@ class DrupalBlogContentHandler extends ToHTMLContentHandler {
     }
 
     public String getSubmissionDate() {
-        return isBlogEntry ? submissionDate.toString() : null;
+        String[] dateTokens = submissionDate.toString().split(" ");
+        if (isBlogEntry && dateTokens.length >= 4) {
+            return dateTokens[1] + " " + dateTokens[3];
+        }
+        return null;
     }
 
     public List<String> getTags() {

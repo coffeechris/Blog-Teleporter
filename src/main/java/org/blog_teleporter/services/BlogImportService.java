@@ -5,5 +5,5 @@ import java.util.List;
 import org.blog_teleporter.models.TextPost;
 
 public interface BlogImportService {
-    public List<TextPost> getTextPostsByCrawl(String blogUrl, String articleUrlPrefix);
+    public List<TextPost> getTextPostsByCrawl(String blogUrl, String articleUrlPrefix, String blogEntryStartComment, String blogEntryEndComment);
 }

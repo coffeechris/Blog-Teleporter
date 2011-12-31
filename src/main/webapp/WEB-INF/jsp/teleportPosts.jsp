@@ -15,6 +15,15 @@
         <form:label path="targetUrl"><fmt:message key="teleport.posts.label.targetUrl"/></form:label>
         <form:input path="targetUrl"/>
         <br/>
+        <form:label path="articleUrlPrefix"><fmt:message key="teleport.posts.label.articleUrlPrefix"/></form:label>
+        <form:input path="articleUrlPrefix"/>
+        <br/>
+        <form:label path="blogEntryStartComment"><fmt:message key="teleport.posts.label.blogEntryStartComment"/></form:label>
+        <form:input path="blogEntryStartComment"/>
+        <br/>
+        <form:label path="blogEntryEndComment"><fmt:message key="teleport.posts.label.blogEntryEndComment"/></form:label>
+        <form:input path="blogEntryEndComment"/>
+        <br/>
         <form:label path="blogName"><fmt:message key="teleport.posts.label.blogname"/></form:label>
         <form:input path="blogName"/>
         <br/>
