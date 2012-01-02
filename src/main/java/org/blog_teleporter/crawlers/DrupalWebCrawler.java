@@ -72,6 +72,11 @@ public class DrupalWebCrawler extends WebCrawler {
                 blogEntryEndComment = (String) getConfigs().get("blogEntryEndComment");
             }
             
+            if (StringUtils.isBlank(blogEntryStartComment) || StringUtils.isBlank(blogEntryEndComment)) {
+                logger.error("the blog entry comments must not be blank");
+                throw new RuntimeException("the blog entry comments must not be blank");
+            }
+            
             DrupalBlogContentHandler drupalBlogContentHandler = new DrupalBlogContentHandler(blogEntryStartComment, blogEntryEndComment);
             Metadata metadata = new Metadata();
             ParseContext parseContext = new ParseContext();

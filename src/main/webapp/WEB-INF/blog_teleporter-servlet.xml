@@ -45,6 +45,7 @@
 
     <mvc:view-controller path="/"            view-name="welcome"/>
     <mvc:view-controller path="/welcome.htm" view-name="welcome"/>
+    <mvc:view-controller path="/drupal_teleporter.htm" view-name="drupalTeleporter"/>
     
     <!-- View Resolver -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -53,14 +54,14 @@
         <property name="suffix"    value=".jsp"/>        
     </bean>
     
-    <bean id="teleporterController" class="org.blog_teleporter.controllers.TeleporterController">
+    <bean id="drupalTeleporterController" class="org.blog_teleporter.controllers.DrupalTeleporterController">
         <property name="blogImportService" ref="blogImportService"/>
         <property name="tumblrService" ref="tumblrService"/>
         <property name="apiKey"    value="${oauth.key.tumblr}"/>
         <property name="apiSecret" value="${oauth.secret.tumblr}"/>
-        <property name="teleporterView" value="teleporter"/>
-        <property name="teleportPostsViews" value="teleportPosts"/>
-        <property name="deleteTeleportedPostsView" value="deleteTeleportedPostsView"/>
+        <property name="teleporterView" value="drupalTeleporter"/>
+        <property name="teleportPostsViews" value="teleportDrupalPosts"/>
+        <property name="deleteTeleportedPostsView" value="deleteTumblrPosts"/>
     </bean> 
     
     <bean id="blogImportService" class="org.blog_teleporter.services.DrupalImportService">
